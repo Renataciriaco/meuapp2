@@ -1,17 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { Header, Icon  } from 'react-native-elements';
+import axios from 'axios';
 
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { firebaseConfig } from './Firebase.js';
+
+const app = initializeApp (firebaseConfig);
+const analytics = getAnalytics(app);
 
 const UsuarioScreen = ({navigation}) => {
-  const [name, setName] = useState('');
-  const [cpf, setCpf] = useState('');
+  // const [nome, setName] = useState('');
+  // const [cpf, setCpf] = useState('');
+  // const [telefone, setTelefone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSignUp = () => {
-    // implemente aqui a lógica de cadastro de usuário
-  };
+  
+
+  function cadastrarUsuario(){
+    if((email, password) !== ''){
+        const auth = getAuth ();
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            alert("Usuário Cadastrado!")
+            navigation.navigate('Home');
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(errorCode + errorMessage);
+          });
+      }else{
+        alert('Favor digitar login e senha!');
+      }
+      
+    }
 
   return (
     <View >
@@ -25,13 +52,13 @@ const UsuarioScreen = ({navigation}) => {
               color="white"
             />
           }
-          title=""
+          title="<"
           onPress={()=>navigation.navigate('Home')}            
         /> }
         centerComponent={{ text: 'Usuário', style: { color: '#fff', fontSize: 25 } }}
     />
   
-    <TextInput
+    {/* <TextInput
         style={styles.input}
         placeholder="Nome"
         value={name}
@@ -44,7 +71,7 @@ const UsuarioScreen = ({navigation}) => {
         maxLength={11}
         value={cpf}
         onChangeText={setCpf}
-      />
+      /> */}
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -60,7 +87,7 @@ const UsuarioScreen = ({navigation}) => {
         value={password}
         onChangeText={setPassword}
       />
-      <Button title="Cadastrar" onPress={handleSignUp} />
+      <Button title="Cadastrar" onPress={cadastrarUsuario} />
     </View>
   );
 };

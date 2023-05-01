@@ -1,16 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { Header, Icon  } from 'react-native-elements';
+import axios from 'axios';
+//import firebase from 'firebase';
 
 
-const ContatoScreen = ({navigation}) => {
-  const [name, setName] = useState('');
+function ContatoScreen ({ route, navigation}) {
+  const [nome, setNome] = useState('');
+  const [cpf,setCpf] = useState('');
   const [email, setEmail] = useState('');
   const [telefone, setTelefone] = useState('');
 
-  const handleSignUp = () => {
-    // implemente aqui a lógica de cadastro de usuário
-  };
+  async function inserirDados() {
+    
+    await axios.post('https://644c548917e2663b9d049ecb.mockapi.io/cliente/', {
+      nome: nome,
+      cpf: cpf,
+      telefone: telefone,
+      email: email,
+    }
+    )
+      .then(function (response) {
+        alert('Cadastrado com sucesso!');
+        navigation.navigate('Lista');
+        console.log(response);
+      })
+      .catch(function (error) {
+        showMessage({
+          message: "Algum erro aconteceu!",
+          type: "info",
+        });
+        console.log(error);
+      });
+}
 
   return (
     <View >
@@ -24,17 +46,29 @@ const ContatoScreen = ({navigation}) => {
               color="white"
             />
           }
-          title="<-"
-          onPress={()=>navigation.navigate('Alteracao')}            
+          title="<"
+          onPress={()=>navigation.navigate('Lista')}            
         /> }
+        rightComponent={<Button
+          title="+"
+          onPress={() => navigation.navigate('Alteracao')}
+          />}
         centerComponent={{ text: 'Contato', style: { color: '#fff', fontSize: 25 } }}
     />
   
     <TextInput
         style={styles.input}
         placeholder="Nome"
-        value={name}
-        onChangeText={setName}
+        value={nome}
+        onChangeText={setNome}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="CPF"
+        keyboardType="cpf-address"
+        autoCapitalize="CPF"
+        value={cpf}
+        onChangeText={setCpf}
       />
       <TextInput
         style={styles.input}
@@ -47,12 +81,11 @@ const ContatoScreen = ({navigation}) => {
       <TextInput
         style={styles.input}
         placeholder="Telefone"
-        secureTextEntry
         value={telefone}
         onChangeText={setTelefone}
       />
-      <Button title="Alterar" onPress={handleSignUp} />
-      <Button title="Excluir" onPress={handleSignUp} />
+
+      <Button title="Salvar" onPress={inserirDados} />
     </View>
   );
 };

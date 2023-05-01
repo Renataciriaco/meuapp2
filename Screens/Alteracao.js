@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Button, Header, Icon } from 'react-native-elements';
+import axios from 'axios';
+//import firebase from 'firebase';
+// import FlashMessage from "react-native-flash-message";
+// import { showMessage, hideMessage } from "react-native-flash-message";
 
 function AlteracaoScreen({ route, navigation }) {
   const [getNome, setNome] = useState();
   const [getEmail, setEmail] = useState();
   const [getTelefone, setTelefone] = useState();
+  const [getCpf, setCpf] = useState();
   const [getId, setId] = useState();
 
   // const [novoNome, setNovoNome] = useState(getNome);
@@ -17,34 +22,89 @@ function AlteracaoScreen({ route, navigation }) {
         const { nome } = route.params;
         const { email } = route.params;
         const { telefone } = route.params;
+        const { cpf } = route.params;
         const { id } = route.params;
 
         setNome(nome);
         setEmail(email);
         setTelefone(telefone);
+        setCpf(cpf);
         setId(id);
     }
   }, []);
 
-  function alterar() {
-    const propriedadesAtualizadas = { nome: getNome, email: getEmail, telefone: getTelefone };
-    atualizarContato(getId, propriedadesAtualizadas);
-    alert("Contato Alterado com sucesso!")
-    navigation.navigate('Lista');
+  async function inserirDados() {
+  
+    await axios.post('https://644c548917e2663b9d049ecb.mockapi.io/cliente/', {
+      nome: getNome,
+      cpf: getCpf,
+      telefone: getTelefone,
+      email: getEmail,
+    }
+    )
+      .then(function (response) {
+        alert("Contato Cadastro com sucesso!")
+        navigation.navigate('Lista');
+        console.log(response);
+      })
+      .catch(function (error) {
+        // showMessage({
+        //   message: "Algum erro aconteceu!",
+        //   type: "info",
+        // });
+        console.log(error);
+      });
+}
+
+async function excluirDados(){
+       axios.delete('https://644c548917e2663b9d049ecb.mockapi.io/cliente/'+getId
+      )
+      .then(function (response) {
+          setNome('')
+          setTelefone('')
+          setCpf('')
+          setEmail('')
+          // showMessage({
+          //     message: "Registro excluído com sucesso!",
+          //     type: "success",
+          //   });
+          alert('Excluído com sucesso!');
+          navigation.navigate('Lista');
+        console.log(response);
+      })
+      .catch(function (error) {
+          // showMessage({
+          //     message: "Algum erro aconteceu!",
+          //     type: "info",
+          //   });
+          console.log(error);
+      });
   }
 
-  function excluir() {
-    removerContato(getId);
-    limparCampos();
-    alert("Contato Removido com sucesso!")
-    navigation.navigate('Lista');
-  }
-
-  function limparCampos() {
-    setNome(null);
-    setEmail(null);
-    setTelefone(null);
-    setId(null);
+  async function alterarDados(){
+      await axios.put('https://644c548917e2663b9d049ecb.mockapi.io/cliente/'+getId,{
+       nome:getNome,
+       cpf:getCpf,
+       telefone:getTelefone,
+       email: getEmail  
+      }
+      )
+      .then(function (response) {
+          // showMessage({
+          //     message: "Registro alterado com sucesso!",
+          //     type: "success",
+          //   });
+        alert('Alterado com sucesso!');
+        console.log(response);
+        navigation.navigate('Lista');
+      })
+      .catch(function (error) {
+          // showMessage({
+          //     message: "Algum erro aconteceu!",
+          //     type: "info",
+          //   });
+          console.log(error);
+      });
   }
 
   return (
@@ -61,7 +121,7 @@ function AlteracaoScreen({ route, navigation }) {
             title=""
             onPress={()=>navigation.navigate('Lista')}            
           /> }
-          centerComponent={{ text: 'Contato', style: { color: '#fff', fontSize: 25 } }}
+          centerComponent={{ text: 'Alterar Contato', style: { color: '#fff', fontSize: 25 } }}
       />
       <View style={styles2.container}>    
       
@@ -84,10 +144,10 @@ function AlteracaoScreen({ route, navigation }) {
         value={getTelefone}
         onChangeText={setTelefone}
       />
-      <TouchableOpacity style={styles2.button} onPress={alterar}>
+      <TouchableOpacity style={styles2.button} onPress={alterarDados}>
         <Text style={styles2.buttonText}>Alterar</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles2.button} onPress={excluir}>
+      <TouchableOpacity style={styles2.button} onPress={excluirDados}>
         <Text style={styles2.buttonText}>Excluir</Text>
       </TouchableOpacity>
       </View>

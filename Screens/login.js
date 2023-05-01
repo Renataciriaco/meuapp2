@@ -2,15 +2,37 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 import {  Avatar } from 'react-native-elements';
 
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { firebaseConfig } from './Firebase.js';
+
+const app = initializeApp (firebaseConfig);
+const analytics = getAnalytics(app);
 
 function LoginScreen({navigation}) {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
+  function login(){
+    if((email, password) !== ''){
+      const auth = getAuth ();
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          alert("Login com sucesso!")
+          navigation.navigate('Lista');
+        })
+        .catch((error) => {
+          alert('Login ou Senha inválidos!');
+        });
+    }else{
+      alert('Favor digitar login e senha!');
+    }
+    
+  }
 
-  const handleLogin = () => {
-    // Handle login logic here
-  };
 
   return (
 
@@ -36,7 +58,7 @@ function LoginScreen({navigation}) {
         onChangeText={setPassword}
         style={styles.input}
         secureTextEntry />
-      <Button title="Login" onPress={()=>navigation.navigate('Lista')} />
+      <Button title="Login" onPress={login} />
       <Button title="Cadastre-se" onPress={()=>navigation.navigate('Usuario')} />
 
     </View>
